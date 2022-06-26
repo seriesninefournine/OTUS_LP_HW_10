@@ -11,6 +11,8 @@ outputfileErrorsCount=''
 email="lesson@otus.ru"
 outputlog=''
 reportdate=0
+CountIP=10 #Количество IP адресов, которые попадут в отчет
+CountURL=20 #Количество URL адресов, которые попадут в отчет
 
 #Проверяем мультизапуск
 if [ $(ps -x | grep -E "bash $0" | wc -l) -gt 3 ]; then
@@ -21,7 +23,15 @@ fi
 #Сортируем и записываем полученый файл
 function SortAndSave { 
     if [ -e $1 ]; then
-        sort -n $1 | uniq -c | sort -rn -o$1
+        #sort -n $1 | uniq -c | sort -rn -o$1
+        if [[ "$1" == "$homedir$outputfileIP" ]]; then
+            echo "$(sort -n $1 | uniq -c | sort -rn | head -n $CountIP)" > $1
+        elif [[ "$1" == "$homedir$outputfileAddress" ]]; then 
+            echo "$(sort -n $1 | uniq -c | sort -rn | head -n $CountURL)" > $1
+        else
+            sort -n $1 | uniq -c | sort -rn -o$1
+        fi
+        
     else 
         echo "No new data from $(date -d@$reportdate +"%Y-%m-%d")_$(date -d@$reportdate +"%H-%M-%S")" >> $1
     fi
